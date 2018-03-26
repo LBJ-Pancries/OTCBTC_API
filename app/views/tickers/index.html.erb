@@ -1,12 +1,13 @@
 <table class="table">
   <thead>
     <tr>
+      <th>ID</th>
       <th>Ticker</th>
-      <th>Buy</th>
+      <th>buy</th>
       <th>Sell</th>
       <th>Low</th>
       <th>High</th>
-      <th>Last</th>
+      <th>last</th>
       <th>Vol</th>
       <th></th>
     </tr>
@@ -14,6 +15,7 @@
   <tbody>
     <% @tickers.each do |ticker| %>
     <tr>
+      <td><%= ticker.id %></td>
       <td><%= ticker.ticker_id %></td>
       <td><%= ticker.buy %></td>
       <td><%= ticker.sell %></td>
@@ -21,7 +23,9 @@
       <td><%= ticker.high %></td>
       <td><%= ticker.last %></td>
       <td><%= ticker.vol %></td>
-      <td><%= link_to "更新", update_ticker_ticker_path(ticker), :method => :post %></td>
+      <td>
+        <%= link_to "更新", update_ticker_ticker_path(ticker), :method => :post %>
+      </td>
     </tr>
     <% end %>
   </tbody>
