@@ -1,32 +1,8 @@
-<table class="table">
-  <thead>
+<table class="table table-bordered">
+  <% @tickers.each do |ticker| %>
     <tr>
-      <th>ID</th>
-      <th>Ticker</th>
-      <th>buy</th>
-      <th>Sell</th>
-      <th>Low</th>
-      <th>High</th>
-      <th>last</th>
-      <th>Vol</th>
-      <th></th>
+      <td><%= link_to(ticker.ticker_id, ticker_path(ticker))%></td>
     </tr>
-  </thead>
-  <tbody>
-    <% @tickers.each do |ticker| %>
-    <tr>
-      <td><%= ticker.id %></td>
-      <td><%= ticker.ticker_id %></td>
-      <td><%= ticker.buy %></td>
-      <td><%= ticker.sell %></td>
-      <td><%= ticker.low %></td>
-      <td><%= ticker.high %></td>
-      <td><%= ticker.last %></td>
-      <td><%= ticker.vol %></td>
-      <td>
-        <%= link_to "更新", update_ticker_ticker_path(ticker), :method => :post %>
-      </td>
-    </tr>
-    <% end %>
-  </tbody>
+  <% end %>
+
 </table>

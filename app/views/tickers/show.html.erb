@@ -1,0 +1,28 @@
+<h1><%= @ticker.ticker_id %></h1>
+
+<td>
+  <%= link_to "更新", update_ticker_ticker_path(@ticker), :method => :post, :class => "btn btn-primary pull-right" %>
+</td>
+<table class="table">
+  <thead>
+    <tr>
+      <th>buy</th>
+      <th>Sell</th>
+      <th>Low</th>
+      <th>High</th>
+      <th>last</th>
+      <th>Vol</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><%= @ticker.buy %></td>
+      <td><%= @ticker.sell %></td>
+      <td><%= @ticker.low %></td>
+      <td><%= @ticker.high %></td>
+      <td><%= @ticker.last %></td>
+      <td><%= @ticker.vol %></td>
+    </tr>
+  </tbody>
+</table>
