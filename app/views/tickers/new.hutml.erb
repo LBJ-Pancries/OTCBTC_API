@@ -1,0 +1,117 @@
+step1:create new project
+'rails new cook_api'
+'cd cook_api'
+'git init'
+'git add .'
+'git commit -am "rails new cook_api"'
+
+step2:add gem
+gem 'rest-client' #帮助程序发送HTTP请求
+gem 'bootstrap-sass'
+gem 'simple_form'
+
+step3:create cook model
+'rails g model cook'
+<code>
+  class CreateCooks < ActiveRecord::Migration[5.0]
+  def change
+    create_table :cooks do |t|
+      t.string :juhe_id
++      t.string :title
++      t.string :tags
++      t.string :imtro
++      t.string :ingredients
++      t.string :burden
++      t.string :steps, array: true      # 这里我希望的steps是一个数组，查资料说要加arry: true
+                   # 但实际上好像并没有作用（里面的资料仍然是一个长字符串），且后面不能加上default为[]
+      t.timestamps
+    end
+  end
+end
+</code>
+'rake db:migrate'
+
+step4: create controller and view
+'rails g controller cooks'
+<code>
+  def new
+    @cook = Cook.new
+  end
+</code>
+'touch app/views/cooks/new.html.erb'
+<code>
+  <div class="col-md-4 col-md-offset-4" style="margin-top: 80px;">
+    <h2>菜品大全搜索</h2></br>
+    <%= simple_form_for @cook do |f| %>
+      <div class="form-group">
+        <%= f.input :title, input_html: {class: "form-control"} %>
+        <%= f.submit "开搜", class: "btn btn-primary", data: { disable_with: "Submiting..."}%>
+      </div>
+    <% end %>
+  </div>
+</code>
+
+toutes
+<code>
+  resources :cooks
+</code>
+
+step5: create controller and show
+<code>
+  def show
+    @cook = Cook.find(params[:id])
+  end
+
+  def create
+    @cook = Cook.new(cook_params)
+
+    response = RestClient.get "http://apis.juhe.cn/cook/query.php", :params => { :menu => @cook.title, :key => "yourkey" }
+    # 阅读聚合菜谱查询知道menu是必要参数，也就是我们需要查询的菜名，传给menu
+    data = JSON.parse(response.body)
+    @cook.updata( :burder => data['result']['data'][0]['burden'],
+                  :title => data['result']['data'][0]['title'],
+                  :ingredients => data['result']['data'][0]['ingredients'])
+                  #这里存资料是需要去分析api提供资料的结构，保证下面层的唯一性
+                  #这里['data']后面接[0]是由于data是一个数组，保证唯一性取首
+    @cook.steps = [] #试过必须要对steps初始化，具体原因还不明白
+    data['result']['data'][0]['steps'].each do |d|
+      @cook.steps += d['step']
+    end
+    #这里作用是将菜品做法（每一步）放入steps中
+    @cook.save
+    resirect_to cook_path(@cook)
+  end
+  private
+  def cook_params
+    params.require(:cook).permit(:title)
+  end
+</code>
+'touch app/views/cooks/show.html.erb'
+<code>
+  <div class="container-fluid">
+    <h2 class="align-center">菜名查询结果</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>菜名</th>
+          <th>调料</th>
+          <th>所需材料</th>
+          <th colspan="2"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= @cook.id %></td>
+          <td><%= @cook.title %></td>
+          <td><%= @cook.burden %></td>
+          <td><%= @cook.ingredients %></td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>具体做法：</h4>
+    <%= @cook.steps %>
+    <br>
+    <td><%= link_to('返回首页', new_cook_path, class: "btn btn-primary btn-md")%></td>
+  </div>
+</code>
